@@ -186,3 +186,28 @@ void set_up_chessboard(){
         center,normal,Xaxis,Xlen,Ylen);
 
 }
+
+void set_up_triangles(){
+
+    int index = 5;
+    glm::vec3 mat_ambient = glm::vec3(0.1, 0.1, 0.1);
+    glm::vec3 mat_diffuse = glm::vec3(0.5, 0.0, 0.25);
+    glm::vec3 mat_specular = glm::vec3(1.0, 1.0, 1.0);
+    float  mat_shineness = 40;
+
+    float reflectance = 1.0;
+
+    glm::vec3 point[3] = {
+        glm::vec3(0.5,0.5,-1.6),
+        glm::vec3(0.5,1.5,-1.6),
+        glm::vec3(-0.5,1.5,-1.6)
+    };
+
+    bool refract = true;
+    float refractivity = 1.5;
+    float refractance = 1.0;
+
+    addTriangle(index,mat_ambient,mat_diffuse,mat_specular,mat_shineness,reflectance,
+        point[0],point[1],point[2], refract, refractivity, refractance);
+
+}

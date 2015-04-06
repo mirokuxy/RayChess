@@ -101,6 +101,7 @@ int chessboard_on = 0; // whether to set up chessboard
 int refract_on = 0;	// whether have refraction effect
 int difref_on = 0; // whether to have diffuse reflection
 int antiAlias_on = 0; 	// whether to have anti alias
+int triangle_on = 0;	// whether show triangle mesh
 
 // OpenGL
 const int NumPoints = 6;
@@ -267,10 +268,13 @@ int main( int argc, char **argv )
 		if (strcmp(argv[i], "+r") == 0) refract_on = 1;
 		if (strcmp(argv[i], "+f") == 0) difref_on = 1;
 		if (strcmp(argv[i], "+p") == 0) antiAlias_on = 1;
+		if (strcmp(argv[i], "+t") == 0) triangle_on = 1;
 	}
 
 	if(chessboard_on)
 		set_up_chessboard();
+	if(triangle_on)
+		set_up_triangles();
 
 	//printObjects();
 

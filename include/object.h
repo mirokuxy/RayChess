@@ -39,9 +39,9 @@ public:
     float refractance;      // [0,1] determines how much refracted light contributes
                             // to the color of a pixel
 
-    Object():type('O'),next(NULL), refract(false),refractivity(2),refractance(0){}
+    Object():type('O'),next(NULL), refract(false),refractivity(1.5),refractance(0){}
 
-    Object(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl, bool refr = false, float refrty = 2, float refrce = 0):
+    Object(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl, bool refr = false, float refrty = 1.5, float refrce = 0):
         index(id),mat_ambient(amb),mat_diffuse(dif),mat_specular(spe),mat_shineness(shine),reflectance(refl),
         next(NULL),type('O'), refract(refr), refractivity(refrty), refractance(refrce){}
 
@@ -78,6 +78,9 @@ public:
         return Intersect(eye,ray,hit);
     }
 
+    // set *outRay and return true if not total reflection; return false other wise
+    virtual bool GetRefractRay(glm::vec3 inRay, glm::vec3 inPoint, glm::vec3 *outRay);
+
     virtual bool Refract(glm::vec3 inRay, glm::vec3 inPoint, glm::vec3 *outRay, glm::vec3 *outPoint){ 
         return false;
     }
@@ -91,7 +94,7 @@ public:
     Sphere():Object(),center(glm::vec3(0,0,0)),radius(1){ type = 'S'; }
 
     Sphere(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl,
-        glm::vec3 ctr,float rad, bool refr = false, float refrty = 2, float refrce = 0):
+        glm::vec3 ctr,float rad, bool refr = false, float refrty = 1.5, float refrce = 0):
         Object(id,amb,dif,spe,shine,refl,refr,refrty,refrce),center(ctr),radius(rad){
             type = 'S';
         }
@@ -122,11 +125,7 @@ public:
     // set *outRay, *outPoint and return true if success
     // otherwise return false
     // refract can fail out of precision error
-    bool Refract(glm::vec3 inRay, glm::vec3 inPoint, glm::vec3 *outRay, glm::vec3 *outPoint);  
-
-private:
-    // set *outRay and return true if not total reflection; return false other wise
-    bool GetRefractRay(glm::vec3 inRay, glm::vec3 inPoint, glm::vec3 *outRay);    
+    bool Refract(glm::vec3 inRay, glm::vec3 inPoint, glm::vec3 *outRay, glm::vec3 *outPoint);   
 
 };
 
@@ -188,6 +187,52 @@ public:
 
 };
 
+
+class Triangle: public Object{
+public:
+    glm::vec3 vertex[3];
+    glm::vec3 normal;
+
+    Triangle():Object(){
+        vertex[0] = glm::vec3(0,0,0);
+        vertex[1] = glm::vec3(1,0,0);
+        vertex[2] = glm::vec3(0,1,0);
+        normal = glm::vec3(0,0,1);
+        type = 'T';
+    }
+
+    Triangle(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl,
+       glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, bool refr = false, float refrty = 1.5, float refrce = 0 ):
+        Object(id,amb,dif,spe,shine,refl,refr,refrty,refrce){
+            vertex[0] = p0; vertex[1] = p1; vertex[2] = p2;
+            normal = glm::normalize( glm::cross(p1 - p0 , p2 -p1) );
+            type = 'T';
+        }
+
+    glm::vec3 GetAmbient(glm::vec3 vertex){
+        return mat_ambient;
+    }
+
+    glm::vec3 GetDiffuse(glm::vec3 vertex){
+        return mat_diffuse;
+    }
+
+    glm::vec3 GetNormal(glm::vec3 vertex){
+        return normal;
+    }
+
+    void PrintShape(){
+        cout << "vertex 1 : " << vertex[0] << "\n";
+        cout << "vertex 2 : " << vertex[1] << "\n";
+        cout << "vertex 3 : " << vertex[2] << "\n";
+        cout << "normal :  " << normal << "\n"; 
+    }
+
+    float Intersect(glm::vec3 eye, glm::vec3 ray, glm::vec3 *hit);
+
+};
+
+
 void addSphere(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl, 
     glm::vec3 ctr, float rad);
 //bool refr = false, float refrty = 2, float refrce = 0
@@ -196,6 +241,12 @@ void addSphere(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine,
 
 void addPlane(int id,glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl,
     glm::vec3 ctr, glm::vec3 norm, glm::vec3 Xax, int Xl, int Yl);
+
+void addTriangle(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl,
+    glm::vec3 p0,glm::vec3 p1, glm::vec3 p2);
+
+void addTriangle(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl,
+    glm::vec3 p0,glm::vec3 p1, glm::vec3 p2, bool refr, float refrty, float refrce);
 
 // intersect ray with scene
 Object* intersectScene(glm::vec3, glm::vec3, glm::vec3 *, int);

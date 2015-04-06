@@ -52,6 +52,7 @@ extern int step_max;
 extern int refract_on;
 extern int difref_on;
 extern int antiAlias_on;
+extern int triangle_on;
 
 /////////////////////////////////////////////////////////////////////
 inline float max(float a,float b){ return a>b?a:b; }
@@ -149,10 +150,19 @@ glm::vec3 recursive_ray_trace(glm::vec3 eye, glm::vec3 ray,int ignore, int step)
         }
 
         if(refract_on && step < step_max && S->refract ){
-            glm::vec3 outRay, outPoint;
-            if(S->Refract(ray, hit, &outRay, &outPoint)){
-                glm::vec3 color_rfr = recursive_ray_trace(outPoint, outRay, S->index, step+1);
-                color += color_rfr * S->refractance;
+            if(S->type == 'S'){
+                glm::vec3 outRay, outPoint;
+                if(S->Refract(ray, hit, &outRay, &outPoint)){
+                    glm::vec3 color_rfr = recursive_ray_trace(outPoint, outRay, S->index, step+2);
+                    color += color_rfr * S->refractance;
+                }  
+            }
+            else{
+                glm::vec3 outRay;
+                if(S->GetRefractRay(ray, hit, &outRay)){
+                    glm::vec3 color_rfr = recursive_ray_trace(hit,outRay, S->index, step+1);
+                    color += color_rfr * S->refractance;
+                }
             }
         }
 

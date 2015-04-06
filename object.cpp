@@ -19,6 +19,8 @@ ostream& operator << (ostream& os, glm::vec3& vec){
 
 const float precision = 0.00001;
 
+//---------------------------------------------------------------------------------
+
 /**********************************************************************
  * This function intersects a ray with a given sphere 'sph'.
  * The function returns the distance from the eye to the intersection point, 
@@ -71,6 +73,29 @@ float Sphere::Intersect(glm::vec3 eye, glm::vec3 ray, glm::vec3 *hit, bool near)
     }  
 }
 
+// set *outRay and return true if not total reflection; return false other wise
+bool Object::GetRefractRay(glm::vec3 inRay, glm::vec3 inPoint, glm::vec3 *outRay){
+    glm::vec3 normal = GetNormal(inPoint);
+    inRay = glm::normalize(-inRay);
+
+    float ratio;
+
+    if(glm::dot(normal, inRay) > 0 ){   // inward ray
+        ratio = 1 / refractivity ;
+    } 
+    else{   // outward ray
+        normal = -normal;
+        ratio = refractivity;
+    }
+
+    float root = 1 - pow(ratio,2) * ( 1 - pow( glm::dot(normal,inRay), 2) );
+
+    if( root < precision ) return false;
+
+    *outRay = normal * ( ratio * glm::dot(normal,inRay) - sqrt(root) ) - ratio * inRay;
+    return true;
+}    
+
 // set *outRay, *outPoint and return true if success
 // otherwise return false
 // refract can fail out of precision error
@@ -89,28 +114,7 @@ bool Sphere::Refract(glm::vec3 inRay, glm::vec3 inPoint, glm::vec3 *outRay, glm:
 	return true;
 }
 
-// set *outRay and return true if not total reflection; return false other wise
-bool Sphere::GetRefractRay(glm::vec3 inRay, glm::vec3 inPoint, glm::vec3 *outRay){
-	glm::vec3 normal = GetNormal(inPoint);
-	inRay = glm::normalize(-inRay);
 
-	float ratio;
-
-	if(glm::dot(normal, inRay) > 0 ){	// inward ray
-		ratio = 1 / refractivity ;
-	} 
-	else{	// outward ray
-		normal = -normal;
-		ratio = refractivity;
-	}
-
-	float root = 1 - pow(ratio,2) * ( 1 - pow( glm::dot(normal,inRay), 2) );
-
-	if( root < precision ) return false;
-
-	*outRay = normal * ( ratio * glm::dot(normal,inRay) - sqrt(root) ) - ratio * inRay;
-	return true;
-}    
 
 // return -1.0 when no intersection, and do nothing to *hit 
 // else return distance from eye to hit point (positive only), and set *hit
@@ -143,6 +147,58 @@ float Plane::Intersect(glm::vec3 eye, glm::vec3 ray, glm::vec3 *hit){
 
     if( fabs(glm::dot(CtoP, Xaxis)) > Xlen ) return -1.0;
     if( fabs(glm::dot(CtoP, Yaxis)) > Ylen ) return -1.0;
+
+    *hit = point;
+
+    return dist;
+}
+
+float Triangle::Intersect(glm::vec3 eye, glm::vec3 ray, glm::vec3 *hit){
+
+    ray = glm::normalize(ray);
+
+    float divident = glm::dot((vertex[0] - eye) , normal);
+    float divisor = glm::dot(ray , normal);
+
+    /*
+    printf("check if divisor == 0\n");
+
+    printf("-------------\n");
+    cout << "vertex[0] : " << vertex[0] << "\n";
+    cout << "eye : " << eye << "\n";
+    cout << "normal : " << normal << "\n";
+    cout << "ray : " << ray << "\n";
+    cout << "divident : " << divident << "\n";
+    cout << "divisor : " << divisor << "\n";
+    printf("-------------\n");
+    */
+
+    if(-precision < divisor && divisor < precision) return -1.0;
+
+    //printf("divisor != 0\n");
+
+    float dist = divident / divisor;
+
+    if(dist < 0) return -1.0;
+
+    //printf("dist >= 0\n");
+
+    glm::vec3 point = dist * ray + eye;
+
+    bool inside = true;
+    for(int i=0;i<3;i++){
+        glm::vec3 edge = vertex[(i+1) % 3] - vertex[i];
+        glm::vec3 line = point - vertex[i];
+
+        if( glm::dot( normal , glm::cross(edge,line) ) < -precision ){
+            inside = false;
+            break;
+        }
+    }
+
+    if(! inside) return -1.0;
+
+    //printf("! inside\n");
 
     *hit = point;
 
@@ -225,6 +281,20 @@ void addPlane(int id,glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, f
         Plane* pla = new Plane;
         (*pla) = Plane(id,amb,dif,spe,shine,refl,ctr,norm,Xax,Xl,Yl);
         addObject(pla);
+    }
+
+void addTriangle(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl,
+    glm::vec3 p0,glm::vec3 p1, glm::vec3 p2){
+        Triangle *tri = new Triangle; 
+        *tri = Triangle(id, amb, dif, spe, shine, refl, p0, p1, p2);
+        addObject(tri);
+    }
+
+void addTriangle(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shine, float refl,
+    glm::vec3 p0,glm::vec3 p1, glm::vec3 p2, bool refr, float refrty, float refrce){
+        Triangle *tri = new Triangle; 
+        *tri = Triangle(id, amb, dif, spe, shine, refl, p0, p1, p2, refr, refrty, refrce);
+        addObject(tri);
     }
 
 // print all objects in the scene list
