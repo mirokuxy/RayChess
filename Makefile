@@ -19,7 +19,7 @@ LIBDIR=/usr/lib
 # If you have more source files add them here 
 # SOURCE= scene.cpp image_util.cpp sphere.cpp vector.cpp trace.cpp raycast.cpp include/InitShader.cpp
 #SOURCE= scene.cpp image_util.cpp object.cpp trace.cpp raycast.cpp include/InitShader.cpp
-SOURCE= scene.cpp image_util.cpp object.cpp trace.cpp raycast.cpp
+SOURCE= scene.cpp image_util.cpp object.cpp trace.cpp raychess.cpp
 
 # The compiler we are using 
 CC= g++
@@ -33,7 +33,7 @@ CC= g++
 CFLAGS= -O3 -g -DGL_GLEXT_PROTOTYPES
 
 # The name of the final executable 
-EXECUTABLE= raycast
+EXECUTABLE= raychess
 
 # The basic library we are using add the other libraries you want to link
 # to your program here 

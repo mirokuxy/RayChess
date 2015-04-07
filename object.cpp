@@ -13,7 +13,7 @@ extern Object* scene;
 
 
 ostream& operator << (ostream& os, glm::vec3& vec){
-    printf("(%.1f,%.1f,%.1f)",vec.x,vec.y,vec.z);
+    printf("(%.2f,%.2f,%.2f)",vec.x,vec.y,vec.z);
     return os;
 }
 
@@ -300,11 +300,13 @@ void addTriangle(int id, glm::vec3 amb, glm::vec3 dif, glm::vec3 spe, float shin
 // print all objects in the scene list
 void printObjects(){
     for(Object* obj=scene; obj; obj=obj->next){
-        obj->PrintInfo();
-
+        //obj->PrintInfo();
+        obj->PrintShape();
+        /*
         glm::vec3 point(0,5,0);
         glm::vec3 normal = obj->GetNormal(point);
         cout << normal << "\n";
+        */
     }
 }
 

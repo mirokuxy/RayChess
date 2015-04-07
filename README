@@ -1,2 +1,31 @@
 Features Implemented: 
-	All the Features
+	Requirement a;
+
+
+speedup technique : 
+	none
+
+
+make command :
+	make
+
+
+execute command :
+	./raychess step_max <options>
+
+
+options :  (same as raycast, except for no (+c) option)
+	+s : inclusion of shadows
+	+l : inclusion of reflection
+	+r : inclusion of refraction
+	+f : enabling diffuse rendering using stochastic ray generations
+	+p : enabling super-sampling
+
+
+usage example:
+	make;
+	./raychess 5 +s +l
+
+
+caution:
+	executing ( ./raychess 5 +s +l +r +f +p ) takes more than 5 minutes.

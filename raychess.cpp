@@ -103,6 +103,8 @@ int difref_on = 0; // whether to have diffuse reflection
 int antiAlias_on = 0; 	// whether to have anti alias
 int triangle_on = 0;	// whether show triangle mesh
 
+int objectCount = 0;	// number of objects
+
 // OpenGL
 const int NumPoints = 6;
 
@@ -245,36 +247,48 @@ void keyboard(unsigned char key, int x, int y)
 int main( int argc, char **argv )
 {
 	// Parse the arguments
-	if (argc < 3) {
+	if (argc < 2) {
 		printf("Missing arguments ... use:\n");
-		printf("./raycast [-u | -d] step_max <options>\n");
+		printf("./raycast step_max <options>\n");
 		return -1;
 	}
 	
+	/*
 	if (strcmp(argv[1], "-u") == 0) {  // user defined scene
 		set_up_user_scene();
 	} else { // default scene
 		set_up_default_scene();
 	}
+	*/
 
-	step_max = atoi(argv[2]); // maximum level of recursions
+	step_max = atoi(argv[1]); // maximum level of recursions
 
 	// Optional arguments
-	for(int i = 3; i < argc; i++)
+	for(int i = 2; i < argc; i++)
 	{
 		if (strcmp(argv[i], "+s") == 0)	shadow_on = 1;
 		if (strcmp(argv[i], "+l") == 0) reflect_on = 1;
-		if (strcmp(argv[i], "+c") == 0) chessboard_on = 1;
+		//if (strcmp(argv[i], "+c") == 0) chessboard_on = 1;
 		if (strcmp(argv[i], "+r") == 0) refract_on = 1;
 		if (strcmp(argv[i], "+f") == 0) difref_on = 1;
 		if (strcmp(argv[i], "+p") == 0) antiAlias_on = 1;
 		if (strcmp(argv[i], "+t") == 0) triangle_on = 1;
 	}
 
-	if(chessboard_on)
+	set_up_global_variable();
+
+	if(chessboard_on = 1)
 		set_up_chessboard();
+
 	if(triangle_on)
 		set_up_triangles();
+
+
+	//printf("object Count : %d\n",objectCount);
+
+	set_up_chessPiece();
+
+
 
 	//printObjects();
 
