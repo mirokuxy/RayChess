@@ -1,31 +1,35 @@
-Features Implemented: 
+# RayChess
+This is a readme file about the RayChess game.
+
+## Features Implemented: 
 	Requirement a;
 
 
-speedup technique : 
-	none
+## Speedup technique: 
+	None
 
 
-make command :
-	make
+## Make command:
+	```make```
 
 
-execute command :
-	./raychess step_max <options>
+## Execute command:
+	```./raychess step_max <options>```
 
 
-options :  (same as raycast, except for no (+c) option)
-	+s : inclusion of shadows
-	+l : inclusion of reflection
-	+r : inclusion of refraction
-	+f : enabling diffuse rendering using stochastic ray generations
-	+p : enabling super-sampling
+## Options: 
+same as raycast, except for no (+c) option)
+* +s : inclusion of shadows
+* +l : inclusion of reflection
+* +r : inclusion of refraction
+* +f : enabling diffuse rendering using stochastic ray generations
+* +p : enabling super-sampling
 
 
-usage example:
-	make;
-	./raychess 5 +s +l
+## Usage example:
+	```make;```
+	```./raychess 5 +s +l```
 
 
-caution:
-	executing ( ./raychess 5 +s +l +r +f +p ) takes more than 5 minutes.
+## Caution:
+	Executing ( ./raychess 5 +s +l +r +f +p ) takes more than 5 minutes.
